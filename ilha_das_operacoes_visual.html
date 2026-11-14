@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Jogo educativo de Matemática para o 3º ano: quatro operações, com ênfase nos sentidos da divisão.">
+<title>Ilha das Operações — Matemática em aventura</title>
+<style>
+:root{
+  --ink:#24304b;--muted:#68738a;--paper:#fffdf8;--bg:#f2f5ff;--line:#e4e9f4;
+  --purple:#7257d8;--purple-dark:#563eb7;--blue:#4b8fe8;--teal:#35b7a3;
+  --orange:#ffad55;--pink:#f27aa4;--green:#3ca879;--red:#df626b;
+  --shadow:0 14px 34px rgba(48,61,112,.10);--radius:24px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 8% 2%,#e8efff 0,transparent 26rem),radial-gradient(circle at 95% 18%,#fff0df 0,transparent 22rem),var(--bg);color:var(--ink);font-family:Nunito,"Trebuchet MS",Arial,sans-serif;line-height:1.5}
+button,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid #ffc45e;outline-offset:3px}
+.wrap{max-width:1180px;margin:auto;padding:24px 22px 56px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:-.4px}
+.brand-mark{height:48px;width:48px;border-radius:16px;background:linear-gradient(145deg,#896ef1,#5b49c8);display:grid;place-items:center;color:white;font-size:25px;box-shadow:0 8px 18px #7257d844}
+.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;font-weight:800}
+.pill{border:1px solid #dce3f2;border-radius:999px;padding:8px 13px;background:#ffffffbd;color:#56617a;font-size:12px;font-weight:800}
+.hero{position:relative;overflow:hidden;border-radius:32px;padding:32px 34px;background:linear-gradient(120deg,#6351c9 0%,#8068e6 55%,#a08af0 100%);color:white;box-shadow:var(--shadow);display:grid;grid-template-columns:1.35fr .65fr;gap:24px;align-items:center}
+.hero:after{content:"";position:absolute;width:260px;height:260px;border:34px solid #ffffff14;border-radius:50%;right:6%;top:-120px}
+.hero-copy,.hero-art{position:relative;z-index:1}
+.eyebrow{font-size:12px;font-weight:900;letter-spacing:1.8px;text-transform:uppercase;opacity:.82;margin:0 0 9px}
+h1{font-size:clamp(32px,5vw,50px);line-height:1.04;letter-spacing:-1.8px;margin:0 0 14px}
+.hero p{max-width:620px;margin:0;color:#f1edff;font-size:16px}
+.hero-art{display:flex;justify-content:center;align-items:center;min-height:150px}
+.island{width:190px;height:150px;position:relative;display:grid;place-items:center;font-size:82px;filter:drop-shadow(0 12px 5px #342a7c44);transform:rotate(-5deg)}
+.island .spark{position:absolute;font-size:26px}.spark.s1{top:3px;left:18px}.spark.s2{right:8px;top:26px}.spark.s3{bottom:2px;left:28px}
+.panel{background:var(--paper);border:1px solid #edf0f6;border-radius:var(--radius);box-shadow:var(--shadow)}
+.intro-grid{display:grid;grid-template-columns:1fr .85fr;gap:18px;margin:20px 0}
+.section-pad{padding:23px 25px}
+.section-title{font-size:20px;font-weight:950;letter-spacing:-.4px;margin:0 0 7px}
+.subtle{color:var(--muted);font-size:14px;margin:0}
+.name-row{display:flex;gap:10px;margin-top:16px;align-items:center}
+.name-row input{min-width:0;flex:1;border:1.5px solid var(--line);border-radius:13px;padding:12px 14px;background:#fff;color:var(--ink)}
+.primary,.secondary,.ghost{border:0;border-radius:14px;padding:12px 17px;font-weight:900;transition:transform .15s,filter .15s}
+.primary{background:var(--purple);color:white;box-shadow:0 7px 14px #7257d833}.primary:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.secondary{background:#edf0ff;color:var(--purple-dark)}.secondary:hover{background:#e5e9ff}
+.ghost{background:#f6f7fb;color:#59647c;border:1px solid #e9edf5}
+.operation-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.op-mini{border-radius:15px;padding:12px 10px;text-align:center;background:#f6f7ff;border:1px solid #edf0ff}
+.op-mini b{font-size:25px;display:block;color:var(--purple)}.op-mini span{font-size:12px;font-weight:850;color:#5e6980}
+.howto{display:grid;gap:10px;margin-top:14px}
+.how-row{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:#526079}
+.how-num{flex:0 0 24px;height:24px;border-radius:8px;background:#f1edff;color:var(--purple);display:grid;place-items:center;font-weight:950;font-size:12px}
+.map-section{margin-top:26px}
+.map-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:14px}
+.map-head h2{font-size:25px;letter-spacing:-.8px;margin:0}
+.progress-wrap{min-width:170px;max-width:250px;flex:1}
+.progress-label{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;font-weight:900;margin-bottom:6px}
+.progress-track{height:10px;border-radius:99px;background:#e3e8f5;overflow:hidden}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--teal),#87d8bc);border-radius:99px;transition:width .3s}
+.level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.level-card{position:relative;border:2px solid #e6eaf4;background:linear-gradient(155deg,#fff 0%,#fbfaff 100%);border-radius:23px;padding:17px;min-height:165px;text-align:left;box-shadow:0 7px 0 #e7e8f2,0 12px 20px #384a7610;transition:transform .15s,border .15s;overflow:hidden}
+.level-card:not(:disabled):hover{transform:translateY(-5px) rotate(-.5deg);border-color:#b8aff5;box-shadow:0 10px 0 #e7e8f2,0 18px 25px #384a7618}
+.level-card:disabled{cursor:not-allowed;opacity:.55;filter:grayscale(.25)}
+.level-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.level-icon{height:46px;width:46px;border-radius:15px;display:grid;place-items:center;font-size:24px;background:#f0edff}
+.level-state{font-size:11px;color:#778198;font-weight:900}
+.level-card h3{font-size:16px;margin:0 0 4px}.level-card p{font-size:12px;color:var(--muted);margin:0}
+.level-stars{color:#f4ae3f;letter-spacing:3px;font-size:20px;margin-top:10px;text-shadow:0 2px 0 #f8e4b5}.level-card:after{content:"✦";position:absolute;right:13px;bottom:7px;color:#c8c0ff;font-size:30px;transform:rotate(15deg)}
+.tag-focus{display:inline-block;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:900;background:#fff2df;color:#a26520;margin-left:5px}
+.learning{margin-top:25px}
+.learning h2{font-size:26px;margin:0 0 5px;letter-spacing:-.7px}
+.learning-lead{margin:0;color:#65718a;font-size:14px}
+.visual-learning-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:17px}
+.visual-lesson{padding:20px;border-radius:23px;overflow:hidden;position:relative;border:1px solid #e9edf6;box-shadow:0 8px 22px #39466b0d}
+.visual-lesson.addition{background:linear-gradient(145deg,#fff7e9,#fff 70%)}
+.visual-lesson.subtraction{background:linear-gradient(145deg,#fff0f1,#fff 70%)}
+.visual-lesson.multiplication{background:linear-gradient(145deg,#f0f8ed,#fff 70%)}
+.visual-lesson.division{background:linear-gradient(145deg,#eef5ff,#fff 70%)}
+.lesson-heading{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.lesson-bubble{width:48px;height:48px;flex:0 0 48px;border-radius:16px;background:#ffffffd9;display:grid;place-items:center;font-size:27px;box-shadow:0 4px 12px #39466b12}
+.lesson-heading h3{margin:0;font-size:17px;line-height:1.2}.lesson-heading p{margin:3px 0 0;font-size:12px;color:#6c7890}
+.lesson-explain{font-size:13px;color:#5c6880;margin:0 0 12px}
+.visual-demo{background:#ffffffd9;border:1px solid #e8ebf3;border-radius:18px;padding:13px 12px;text-align:center}
+.demo-caption{font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:950;color:#8992a6;margin-bottom:8px}
+.demo-flow{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap}
+.demo-group{min-width:95px;padding:8px 10px;background:#f8f9fd;border:1px solid #e9edf5;border-radius:13px}
+.demo-group b{display:block;font-size:11px;color:#67738a;margin-bottom:5px}
+.demo-objects{display:grid;grid-template-columns:repeat(5,24px);justify-content:center;gap:3px}
+.demo-objects span{font-size:20px;line-height:1.25;display:inline-block}
+.demo-operator{font-size:25px;font-weight:1000;color:#7761d0}
+.demo-result{font-size:25px;font-weight:1000;color:#25845c;background:#eaf8f0;border:1px solid #cdebd9;border-radius:13px;padding:8px 13px}
+.demo-equation{margin-top:10px;font-size:19px;font-weight:1000;color:#3c4962;letter-spacing:.3px}
+.demo-equation strong{color:#24845c}
+.demo-note{margin:9px 0 0;font-size:12px;color:#65718a}
+.apple-board{display:grid;grid-template-columns:repeat(5,30px);justify-content:center;gap:5px;margin:0 auto 8px;max-width:180px}
+.apple-board span{position:relative;font-size:24px;line-height:1.2}
+.apple-board .taken{opacity:.32;filter:grayscale(1)}
+.apple-board .taken:after{content:'✖';position:absolute;inset:-2px 0 0;color:#d6535c;font-size:17px;font-weight:1000;text-shadow:0 1px white;display:grid;place-items:center}
+.removal-legend{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:11px;font-weight:900;color:#69748a}
+.removal-legend span{display:inline-flex;align-items:center;gap:4px}
+.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;background:#ef8589}.legend-dot.keep{background:#48b58a}
+.group-array{display:grid;gap:7px;max-width:310px;margin:0 auto}
+.flower-row{display:flex;align-items:center;justify-content:center;gap:5px;background:#f8fbf5;border:1px solid #e2eddd;border-radius:10px;padding:5px}
+.flower-row span{font-size:21px}
+.flower-row b{font-size:11px;color:#64725e;margin-left:6px}
+.division-groups{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+.division-group{background:#f8fbff;border:1px solid #dfe9f7;border-radius:12px;padding:7px 8px;min-width:65px}
+.division-group b{display:block;font-size:10px;color:#67758c;margin-bottom:4px}
+.division-group span{font-size:19px;letter-spacing:1px;white-space:nowrap}
+.division-duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.division-mini{background:#ffffffc9;border:1px solid #e2eaf5;border-radius:15px;padding:13px}
+.division-mini h4{font-size:13px;margin:0 0 5px}.division-mini p{margin:7px 0 0;color:#64718a;font-size:11px}
+.share-group{background:white;border:1px solid #dcebe7;border-radius:14px;padding:9px 11px;min-width:75px;text-align:center;box-shadow:0 3px 8px #315e5210}
+.share-group b{display:block;font-size:12px;color:#53736d}.share-group span{font-size:19px;letter-spacing:2px;white-space:nowrap}
+@media(max-width:780px){.visual-learning-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.visual-lesson{padding:16px}.division-duo{grid-template-columns:1fr}.demo-flow{gap:6px}.demo-group{min-width:83px;padding:7px 6px}.demo-objects{grid-template-columns:repeat(5,21px)}.demo-objects span{font-size:18px}}
+.game-view{display:none;margin-top:22px}.game-view.active{display:block}
+.game-top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:13px}
+.back-btn{border:0;background:transparent;color:#65708a;font-weight:850;padding:8px 0}
+.game-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.meta-chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:900;color:#5e6982}
+.game-card{padding:26px;max-width:850px;margin:0 auto;border:3px solid #eeeaff;box-shadow:0 9px 0 #e6e0ff,0 18px 36px #5444a21c}
+.lesson-banner{padding:18px 20px;background:linear-gradient(120deg,#f3f0ff,#f3f8ff);border-radius:18px;margin-bottom:20px;border:1px solid #ebe8ff}
+.lesson-banner .mini-label{font-size:10px;text-transform:uppercase;letter-spacing:1.4px;font-weight:950;color:var(--purple)}
+.lesson-banner h2{margin:4px 0 5px;font-size:22px;letter-spacing:-.5px}.lesson-banner p{margin:0;color:#5c6680;font-size:14px}
+.visual-stage{margin:17px 0 18px;border:1px dashed #dce2ef;border-radius:18px;background:#fbfcff;padding:17px;text-align:center;min-height:90px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.question-label{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;font-weight:950;color:#8992a6;margin-bottom:5px}
+.question-text{font-size:clamp(20px,3vw,27px);line-height:1.25;font-weight:950;letter-spacing:-.5px;text-align:center;margin:0 auto 18px;max-width:680px}
+.options{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.option{border:2px solid #e5e9f3;box-shadow:0 4px 0 #e9ebf3;border-radius:16px;padding:16px 10px;background:white;color:#35415c;font-size:21px;font-weight:950;min-height:62px;transition:.15s}
+.option:hover:not(:disabled){border-color:#a99af0;box-shadow:0 6px 0 #e0dcfa;background:#faf9ff;transform:translateY(-2px)}
+.option.correct{background:#e9f8f0;border-color:#67c39a;color:#21764d}.option.wrong{background:#fff0f0;border-color:#e69a9f;color:#af444b}.option:disabled{cursor:default}
+.feedback{display:none;margin-top:16px;padding:14px 16px;border-radius:15px;font-size:14px}.feedback.show{display:block}.feedback.good{background:#eaf8f0;color:#246c4b;border:1px solid #cdebd9}.feedback.try{background:#fff4e8;color:#82511f;border:1px solid #f6dfc1}
+.feedback b{display:block;margin-bottom:3px;font-size:16px}.feedback.show{animation:popIn .25s ease-out}.feedback.good:before{content:"🤩 ";font-size:23px}.feedback.try:before{content:"🙃 ";font-size:23px}@keyframes popIn{from{transform:scale(.97);opacity:.4}to{transform:scale(1);opacity:1}}.question-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:19px}
+.dots{display:flex;gap:6px}.dot{height:8px;width:22px;border-radius:99px;background:#e1e6f1}.dot.done{background:var(--teal)}.dot.current{background:var(--purple)}
+.level-outcome{display:none;text-align:center;padding:35px 25px;max-width:700px;margin:0 auto}.level-outcome.show{display:block}.outcome-icon{font-size:58px}.level-outcome h2{font-size:29px;margin:8px 0}.level-outcome p{color:var(--muted);margin:0 auto 18px;max-width:500px}
+.results{display:none;margin-top:22px}.results.show{display:block}.result-head{padding:27px;background:linear-gradient(120deg,#effbf6,#f5f2ff);border:1px solid #e1eee9;border-radius:24px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.result-head h2{font-size:28px;margin:0 0 5px;letter-spacing:-.8px}.result-head p{margin:0;color:#5c6d7b}.score-big{font-size:40px;font-weight:1000;color:#3b8b71;white-space:nowrap}
+.result-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:16px;margin-top:16px}.result-card{padding:22px}.result-card h3{font-size:18px;margin:0 0 12px}.pie-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.pie{width:145px;height:145px;border-radius:50%;background:conic-gradient(var(--teal) 0 50%,#f2a2a7 50% 100%);position:relative;flex:0 0 auto}.pie:after{content:"";position:absolute;inset:24px;border-radius:50%;background:white}.pie-center{position:absolute;z-index:1;inset:0;display:grid;place-content:center;text-align:center;font-size:22px;font-weight:1000}.pie-center small{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.legend{display:grid;gap:8px;font-size:13px;color:#5c6880}.legend span{display:flex;align-items:center;gap:8px}.swatch{height:10px;width:10px;border-radius:4px;display:inline-block}.skill-list{display:grid;gap:12px}.skill-row{display:grid;grid-template-columns:135px 1fr 40px;gap:8px;align-items:center;font-size:12px;font-weight:850;color:#58647b}.skill-bar{height:10px;border-radius:99px;background:#edf0f6;overflow:hidden}.skill-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#75cbb1,#4b9e89)}
+.guidance{padding:22px;margin-top:16px}.guidance h3{margin:0 0 8px;font-size:19px}.guidance p{color:#5f6b80;margin:0 0 10px;font-size:14px}.guidance ul{margin:8px 0 0;padding-left:20px;color:#526079;font-size:14px}.guidance li{margin:6px 0}
+.answer-key{margin-top:17px;padding:22px}.answer-key h3{font-size:20px;margin:0 0 5px}.answer-key>p{font-size:13px;color:var(--muted);margin:0 0 12px}.key-item{border-top:1px solid #edf0f6;padding:13px 0}.key-item summary{cursor:pointer;font-weight:900;font-size:14px}.key-item p{font-size:13px;color:#5c6880;margin:8px 0 0}.key-status{font-size:11px;font-weight:950;border-radius:999px;padding:3px 8px;margin-left:7px}.key-status.ok{background:#e8f7ee;color:#28754f}.key-status.no{background:#fff0ef;color:#a84c50}
+.end-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.small-note{color:#8a93a5;font-size:11px;margin-top:20px;text-align:center}
+.hidden{display:none!important}
+@media(max-width:780px){.hero{grid-template-columns:1fr;padding:27px}.hero-art{display:none}.intro-grid,.result-grid{grid-template-columns:1fr}.level-grid{grid-template-columns:repeat(2,1fr)}.division-feature{grid-template-columns:1fr}.result-head{align-items:flex-start;flex-direction:column}.score-big{font-size:34px}}
+@media(max-width:520px){.wrap{padding:14px 12px 35px}.topbar{margin-bottom:14px}.brand-mark{height:42px;width:42px}.pill{display:none}.hero{padding:24px 20px;border-radius:24px}h1{font-size:34px}.hero p{font-size:14px}.section-pad{padding:18px}.name-row{align-items:stretch;flex-direction:column}.operation-strip{gap:6px}.op-mini{padding:10px 4px}.op-mini b{font-size:22px}.op-mini span{font-size:10px}.map-head{align-items:flex-start;flex-direction:column}.progress-wrap{width:100%;max-width:none}.level-grid{gap:9px}.level-card{padding:13px;min-height:142px}.level-card h3{font-size:14px}.level-card p{font-size:11px}.lesson-grid{grid-template-columns:1fr}.game-card{padding:17px}.options{grid-template-columns:1fr}.option{min-height:53px;padding:11px}.question-foot{align-items:flex-end}.question-text{font-size:21px}.share-group{min-width:65px;padding:8px 5px}.pie-wrap{justify-content:center}.result-card{padding:18px}.skill-row{grid-template-columns:105px 1fr 34px}.result-head h2{font-size:24px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark">✦</div><div><small>Missão matemática</small>Ilha das Operações</div></div>
+    <div class="pill">3º ano • Ensino Fundamental</div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Uma aventura de aprender e conquistar</p>
+      <h1>Vamos desbloquear<br>o poder dos números?</h1>
+      <p>Resolva desafios, conquiste estrelas e avance por seis fases. A missão especial é dominar a divisão: repartir em partes iguais e descobrir quantos grupos podemos formar.</p>
+    </div>
+    <div class="hero-art" aria-hidden="true"><div class="island">🏝️<span class="spark s1">✦</span><span class="spark s2">⭐</span><span class="spark s3">🍬</span></div></div>
+  </section>
+
+  <section class="intro-grid" id="intro">
+    <div class="panel section-pad">
+      <h2 class="section-title">Quem vai viver essa aventura?</h2>
+      <p class="subtle">Digite o nome do estudante para personalizar o relatório ao final.</p>
+      <div class="name-row"><input id="studentName" type="text" maxlength="35" placeholder="Nome do(a) estudante" aria-label="Nome do estudante"><button class="primary" id="beginBtn">Começar aventura</button></div>
+      <div class="operation-strip" aria-label="As quatro operações"><div class="op-mini"><b>＋</b><span>Adição</span></div><div class="op-mini"><b>−</b><span>Subtração</span></div><div class="op-mini"><b>×</b><span>Multiplicação</span></div><div class="op-mini"><b>÷</b><span>Divisão</span></div></div>
+    </div>
+    <div class="panel section-pad">
+      <h2 class="section-title">Como jogar?</h2>
+      <p class="subtle">Cada fase tem uma explicação e desafios de Matemática.</p>
+      <div class="howto"><div class="how-row"><span class="how-num">1</span><span>Leia a dica e observe o desenho antes de responder.</span></div><div class="how-row"><span class="how-num">2</span><span>Escolha uma resposta. Você verá na hora se acertou e por quê.</span></div><div class="how-row"><span class="how-num">3</span><span>Faça pelo menos 2 acertos em cada fase para abrir a próxima.</span></div></div>
+    </div>
+  </section>
+
+  <section class="map-section" id="mapSection">
+    <div class="map-head"><div><h2>🗺️ Mapa da aventura</h2><p class="subtle">Seis fases para conquistar a ilha!</p></div><div class="progress-wrap"><div class="progress-label"><span>PROGRESSO</span><span id="progressText">0 de 6 fases</span></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div></div>
+    <div class="level-grid" id="levelGrid"></div><p style="text-align:center;font-size:14px;font-weight:900;color:#7868bf;margin:15px 0 0">🐵 Dica do macaquinho: para ganhar 3 estrelas, acerte todos os desafios da fase. Errar faz parte de aprender! 🍌</p>
+  </section>
+
+  <section class="learning" id="learningSection">
+    <h2>📚 Antes de jogar, vamos aprender!</h2>
+    <p class="learning-lead">Olhe os desenhos, conte os objetos e acompanhe o que acontece em cada operação. É Matemática com os olhos e com a cabeça! 🐵</p>
+
+    <div class="visual-learning-grid">
+      <article class="visual-lesson addition">
+        <div class="lesson-heading"><div class="lesson-bubble">🍎</div><div><h3>1. Adição: juntar</h3><p>Quando juntamos, a quantidade aumenta.</p></div></div>
+        <p class="lesson-explain">A Nina tinha 6 maçãs e ganhou mais 4. Vamos juntar os dois grupos!</p>
+        <div class="visual-demo">
+          <div class="demo-caption">Junte os dois montes</div>
+          <div class="demo-flow">
+            <div class="demo-group"><b>6 maçãs</b><div class="demo-objects"><span>🍎</span><span>🍎</span><span>🍎</span><span>🍎</span><span>🍎</span><span>🍎</span></div></div>
+            <span class="demo-operator">+</span>
+            <div class="demo-group"><b>4 maçãs</b><div class="demo-objects"><span>🍎</span><span>🍎</span><span>🍎</span><span>🍎</span></div></div>
+            <span class="demo-operator">=</span>
+            <div class="demo-result">10 🍎</div>
+          </div>
+          <div class="demo-equation">6 + 4 = <strong>10 maçãs</strong></div>
+          <p class="demo-note">🎉 Agora a Nina tem 10 maçãs. A cesta ficou cheia!</p>
+        </div>
+      </article>
+
+      <article class="visual-lesson subtraction">
+        <div class="lesson-heading"><div class="lesson-bubble">🧺</div><div><h3>2. Subtração: tirar</h3><p>Quando tiramos, descobrimos o que sobrou.</p></div></div>
+        <p class="lesson-explain">O Tito tinha 10 maçãs e comeu 5. As maçãs apagadinhas com X foram embora!</p>
+        <div class="visual-demo">
+          <div class="demo-caption">Tínhamos 10 maçãs. Vamos retirar 5!</div>
+          <div class="apple-board" aria-label="Dez maçãs: cinco retiradas e cinco que sobraram">
+            <span class="taken">🍎</span><span class="taken">🍎</span><span class="taken">🍎</span><span class="taken">🍎</span><span class="taken">🍎</span>
+            <span>🍎</span><span>🍎</span><span>🍎</span><span>🍎</span><span>🍎</span>
+          </div>
+          <div class="removal-legend"><span><i class="legend-dot"></i> 5 comidas</span><span><i class="legend-dot keep"></i> 5 sobraram</span></div>
+          <div class="demo-equation">10 − 5 = <strong>5 maçãs</strong></div>
+          <p class="demo-note">😋 O Tito comeu 5. Restaram 5 maçãs na cesta!</p>
+        </div>
+      </article>
+
+      <article class="visual-lesson multiplication">
+        <div class="lesson-heading"><div class="lesson-bubble">🌼</div><div><h3>3. Multiplicação: grupos iguais</h3><p>Vários grupos com a mesma quantidade.</p></div></div>
+        <p class="lesson-explain">A abelhinha fez 3 canteiros. Em cada canteiro, colocou 4 flores. Quantas flores há no total?</p>
+        <div class="visual-demo">
+          <div class="demo-caption">Conte as flores de cada canteiro</div>
+          <div class="group-array">
+            <div class="flower-row"><span>🌼 🌼 🌼 🌼</span><b>4 flores</b></div>
+            <div class="flower-row"><span>🌼 🌼 🌼 🌼</span><b>4 flores</b></div>
+            <div class="flower-row"><span>🌼 🌼 🌼 🌼</span><b>4 flores</b></div>
+          </div>
+          <div class="demo-equation">4 + 4 + 4 = 3 × 4 = <strong>12 flores</strong></div>
+          <p class="demo-note">🐝 São 3 grupos de 4. Não precisa contar uma por uma: 3 vezes 4 são 12!</p>
+        </div>
+      </article>
+
+      <article class="visual-lesson division">
+        <div class="lesson-heading"><div class="lesson-bubble">🍬</div><div><h3>4. Divisão: repartir igualmente</h3><p>Todo mundo recebe a mesma quantidade.</p></div></div>
+        <p class="lesson-explain">O papagaio Zeca tem 12 balas para repartir igualmente entre 3 amigos. Quantas balas cada um recebe?</p>
+        <div class="visual-demo">
+          <div class="demo-caption">Distribua 12 balas em 3 pratos</div>
+          <div class="division-groups">
+            <div class="division-group"><b>Amigo 1</b><span>🍬🍬🍬🍬</span></div>
+            <div class="division-group"><b>Amigo 2</b><span>🍬🍬🍬🍬</span></div>
+            <div class="division-group"><b>Amigo 3</b><span>🍬🍬🍬🍬</span></div>
+          </div>
+          <div class="demo-equation">12 ÷ 3 = <strong>4 balas para cada um</strong></div>
+          <p class="demo-note">😄 Ninguém ficou com mais ou menos. A divisão foi justa!</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="visual-lesson division" style="margin-top:16px">
+      <div class="lesson-heading"><div class="lesson-bubble">🧠</div><div><h3>⭐ Atenção: a divisão tem dois jeitos de aparecer!</h3><p>Leia a pergunta para descobrir o que precisamos encontrar.</p></div></div>
+      <div class="division-duo">
+        <div class="division-mini">
+          <h4>🤝 Jeito 1 — repartir</h4>
+          <div class="division-groups"><div class="division-group"><b>Prato 1</b><span>🍪🍪🍪🍪</span></div><div class="division-group"><b>Prato 2</b><span>🍪🍪🍪🍪</span></div><div class="division-group"><b>Prato 3</b><span>🍪🍪🍪🍪</span></div></div>
+          <p>12 biscoitos para 3 crianças. Quantos cada uma recebe? <b>4 para cada!</b></p>
+        </div>
+        <div class="division-mini">
+          <h4>📦 Jeito 2 — formar grupos</h4>
+          <div class="division-groups"><div class="division-group"><b>Grupo 1</b><span>🍪🍪🍪</span></div><div class="division-group"><b>Grupo 2</b><span>🍪🍪🍪</span></div><div class="division-group"><b>Grupo 3</b><span>🍪🍪🍪</span></div><div class="division-group"><b>Grupo 4</b><span>🍪🍪🍪</span></div></div>
+          <p>12 biscoitos em grupos de 3. Quantos grupos conseguimos? <b>4 grupos!</b></p>
+        </div>
+      </div>
+      <div class="demo-equation" style="text-align:center;margin-top:13px">12 ÷ 3 = <strong>4</strong> • 12 ÷ 3 = <strong>4</strong></div>
+      <p class="demo-note" style="text-align:center">💡 O resultado é 4 nos dois exemplos, mas a pergunta mudou: em um, descobrimos quanto cada um recebe; no outro, quantos grupos conseguimos montar.</p>
+    </div>
+  </section>
+
+  <section class="game-view" id="gameView" aria-live="polite">
+    <div class="game-top"><button class="back-btn" id="backMap">← Voltar ao mapa</button><div class="game-meta"><span class="meta-chip" id="gameLevel">Fase 1</span><span class="meta-chip" id="gameScore">⭐ 0 acertos</span></div></div>
+    <div class="panel game-card" id="questionCard">
+      <div class="lesson-banner"><div class="mini-label">DICA DA FASE</div><h2 id="lessonTitle"></h2><p id="lessonText"></p></div>
+      <div class="question-label" id="questionCounter">DESAFIO 1 DE 3</div>
+      <div class="visual-stage" id="visualStage"></div><div style="text-align:center;margin:-5px 0 15px;color:#8067c9;font-weight:900;font-size:13px">🦜 Papagaio Zeca pergunta: pensa, conta e escolhe! (Ele não aceita resposta em forma de banana 🍌)</div>
+      <p class="question-text" id="questionText"></p>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback" role="status"></div>
+      <div class="question-foot"><div class="dots" id="questionDots"></div><button class="primary hidden" id="nextQuestion">Próximo desafio →</button></div>
+    </div>
+    <div class="panel level-outcome" id="levelOutcome"></div>
+  </section>
+
+  <section class="results" id="resultsSection">
+    <div class="result-head"><div><p class="eyebrow" style="color:#4d927b;opacity:1">Missão concluída</p><h2 id="resultTitle">Parabéns, aventureiro(a)!</h2><p id="resultSubtitle">Veja como foi sua jornada pela Ilha das Operações.</p></div><div class="score-big" id="scoreBig">0%</div></div>
+    <div class="result-grid">
+      <div class="panel result-card"><h3>📊 Seu resultado geral</h3><div class="pie-wrap"><div class="pie" id="resultPie"><div class="pie-center" id="pieCenter">0%<small>acertos</small></div></div><div class="legend"><span><i class="swatch" style="background:var(--teal)"></i><b id="correctLegend">0 acertos</b></span><span><i class="swatch" style="background:#f2a2a7"></i><b id="wrongLegend">0 para praticar</b></span></div></div><p class="subtle" id="resultCount" style="margin-top:15px"></p></div>
+      <div class="panel result-card"><h3>🧭 Desempenho por conteúdo</h3><div class="skill-list" id="skillList"></div></div>
+    </div>
+    <div class="panel guidance" id="guidance"><h3>🎯 Seu plano de estudos</h3><div id="guidanceText"></div></div>
+    <div class="panel answer-key"><h3>📝 Gabarito comentado</h3><p>Abra cada desafio para conferir a resposta correta, a explicação e como foi sua resposta.</p><div id="answerKey"></div></div>
+    <div class="end-actions"><button class="primary" id="playAgain">Jogar novamente</button><button class="secondary" id="backToLessons">Rever o material de estudo</button></div>
+  </section>
+  <p class="small-note">Material pedagógico interativo • 3º ano do Ensino Fundamental • Ilustrações simples em HTML e vetores, sem imagens geradas por IA.</p>
+</div>
+
+<script>
+const levels = [
+ {title:'Feira da Adição',short:'Juntar para descobrir o total',icon:'🍓',color:'#fff0e4',category:'Adição',lessonTitle:'Vamos juntar quantidades!',lesson:'Quando juntamos dois grupos, usamos a adição. Some primeiro as unidades e depois as dezenas. Dica: você também pode contar para a frente.',visual:'<span style="font-size:32px">🍓🍓🍓</span><b style="font-size:22px;color:#7a62d8">+</b><span style="font-size:32px">🍓🍓</span><b style="font-size:22px;color:#7a62d8">= ?</b>',questions:[
+  {id:'a1',skill:'Adição',text:'Lia tinha 27 figurinhas e ganhou mais 15. Quantas figurinhas ela tem agora?',visual:'<span style="font-size:24px">🃏 × 27</span><b>+</b><span style="font-size:24px">🃏 × 15</span>',opts:['32','42','52'],ans:1,comment:'Juntamos 27 e 15. Podemos fazer 27 + 10 = 37 e depois 37 + 5 = 42. Lia ficou com 42 figurinhas.'},
+  {id:'a2',skill:'Adição',text:'Uma biblioteca recebeu 136 livros pela manhã e 42 à tarde. Quantos livros recebeu ao todo?',visual:'<div class="share-group"><b>Manhã</b><span>📚 136</span></div><b style="font-size:22px">+</b><div class="share-group"><b>Tarde</b><span>📚 42</span></div>',opts:['168','178','188'],ans:1,comment:'Somamos 136 + 42. Primeiro 136 + 40 = 176; depois 176 + 2 = 178 livros.'},
+  {id:'a3',skill:'Adição',text:'No pomar há 28 laranjas e 17 mangas. Quantas frutas há no total?',visual:'<span style="font-size:30px">🍊🍊🍊</span><span style="font-size:30px">🥭🥭</span>',opts:['45','44','46'],ans:0,comment:'A palavra “total” indica que precisamos juntar as quantidades: 28 + 17 = 45 frutas.'}
+ ]},
+ {title:'Ponte da Subtração',short:'Descobrir o que sobrou',icon:'🌉',color:'#eaf2ff',category:'Subtração',lessonTitle:'Agora, vamos descobrir o que sobrou!',lesson:'Na subtração, tiramos uma quantidade de outra ou comparamos dois valores. Comece retirando as dezenas e depois as unidades.',visual:'<span style="font-size:28px">🧸🧸🧸🧸🧸</span><span style="font-size:14px;color:#65718b">tirar alguns</span><span style="font-size:28px">🧸🧸</span>',questions:[
+  {id:'s1',skill:'Subtração',text:'Pedro tinha 63 carrinhos e deu 28 para seu primo. Com quantos carrinhos ficou?',visual:'<span style="font-size:29px">🚗 63</span><b>−</b><span style="font-size:29px">28</span>',opts:['35','45','41'],ans:0,comment:'Calculamos 63 − 28. Tirando 20, ficam 43. Tirando mais 8, ficam 35 carrinhos.'},
+  {id:'s2',skill:'Subtração',text:'Uma escola tinha 150 folhas coloridas e usou 70. Quantas folhas sobraram?',visual:'<div class="share-group"><b>Havia</b><span>📄 150</span></div><b>−</b><div class="share-group"><b>Usadas</b><span>📄 70</span></div>',opts:['70','80','90'],ans:1,comment:'150 − 70 = 80. Como retiramos 7 dezenas de 15 dezenas, sobraram 8 dezenas: 80 folhas.'},
+  {id:'s3',skill:'Subtração',text:'Havia 42 maçãs na cesta. A família comeu 16. Quantas maçãs restaram?',visual:'<span style="font-size:34px">🧺🍎🍎🍎</span><span style="font-weight:900;color:#65718b">42 − 16</span>',opts:['26','28','36'],ans:0,comment:'Fazemos 42 − 16. Primeiro 42 − 10 = 32; depois 32 − 6 = 26 maçãs.'}
+ ]},
+ {title:'Floresta da Multiplicação',short:'Somar grupos iguais',icon:'🌳',color:'#e8f7ed',category:'Multiplicação',lessonTitle:'Grupos iguais ficam mais fáceis!',lesson:'Multiplicar é somar a mesma quantidade várias vezes. Três grupos com quatro objetos são 4 + 4 + 4, ou seja, 3 × 4.',visual:'<div class="share-group"><b>Grupo 1</b><span>🌼🌼🌼</span></div><div class="share-group"><b>Grupo 2</b><span>🌼🌼🌼</span></div><div class="share-group"><b>Grupo 3</b><span>🌼🌼🌼</span></div>',questions:[
+  {id:'m1',skill:'Multiplicação',text:'Há 4 saquinhos com 3 bolinhas em cada um. Quantas bolinhas há ao todo?',visual:'<div class="share-group"><span>🔴🔴🔴</span></div><div class="share-group"><span>🔴🔴🔴</span></div><div class="share-group"><span>🔴🔴🔴</span></div><div class="share-group"><span>🔴🔴🔴</span></div>',opts:['7','12','16'],ans:1,comment:'São 4 grupos de 3: 3 + 3 + 3 + 3 = 12. Então, 4 × 3 = 12 bolinhas.'},
+  {id:'m2',skill:'Multiplicação',text:'Uma caixa tem 5 lápis. Quantos lápis há em 6 caixas iguais?',visual:'<span style="font-size:34px">✏️ × 5</span><span style="font-size:15px">em cada caixa</span><b>× 6 caixas</b>',opts:['11','25','30'],ans:2,comment:'São 6 grupos de 5 lápis: 5 + 5 + 5 + 5 + 5 + 5 = 30. Portanto, 6 × 5 = 30.'},
+  {id:'m3',skill:'Multiplicação',text:'No jardim foram plantadas 4 fileiras com 7 flores em cada uma. Quantas flores foram plantadas?',visual:'<div style="display:grid;grid-template-columns:repeat(7,20px);gap:5px">'+Array(28).fill('<span style="font-size:18px">🌷</span>').join('')+'</div>',opts:['24','28','32'],ans:1,comment:'Temos 4 fileiras com 7 flores. Fazemos 4 × 7 = 28 flores.'}
+ ]},
+ {title:'Praça da Divisão',short:'Repartir em partes iguais',icon:'🍬',color:'#fff0f5',category:'Divisão — repartir',lessonTitle:'Dividir é repartir sem deixar ninguém com mais!',lesson:'Quando repartimos igualmente, todos recebem a mesma quantidade. Conte o total e distribua um de cada vez para cada grupo.',visual:'<div class="share-group"><b>Ana</b><span>🍬🍬🍬🍬</span></div><div class="share-group"><b>Beto</b><span>🍬🍬🍬🍬</span></div><div class="share-group"><b>Léo</b><span>🍬🍬🍬🍬</span></div><div style="font-weight:900;color:#4b947d">12 ÷ 3 = 4</div>',questions:[
+  {id:'d1',skill:'Divisão — repartir',text:'12 balas serão repartidas igualmente entre 3 crianças. Quantas balas cada criança receberá?',visual:'<div class="share-group"><b>Criança 1</b><span>🍬🍬🍬🍬</span></div><div class="share-group"><b>Criança 2</b><span>🍬🍬🍬🍬</span></div><div class="share-group"><b>Criança 3</b><span>🍬🍬🍬🍬</span></div>',opts:['3','4','5'],ans:1,comment:'Repartimos 12 balas em 3 grupos iguais. Cada criança recebe 4, pois 4 + 4 + 4 = 12. Assim, 12 ÷ 3 = 4.'},
+  {id:'d2',skill:'Divisão — repartir',text:'20 lápis serão distribuídos igualmente entre 5 estudantes. Quantos lápis cada um receberá?',visual:'<span style="font-size:28px">✏️✏️✏️✏️✏️</span><span style="font-size:28px">✏️✏️✏️✏️✏️</span><span style="font-size:28px">✏️✏️✏️✏️✏️</span><span style="font-size:28px">✏️✏️✏️✏️✏️</span>',opts:['4','5','10'],ans:0,comment:'Precisamos dividir 20 lápis em 5 partes iguais. Como 5 × 4 = 20, cada estudante recebe 4 lápis.'},
+  {id:'d3',skill:'Divisão — repartir',text:'18 biscoitos serão colocados igualmente em 3 pratos. Quantos biscoitos ficarão em cada prato?',visual:'<div class="share-group"><b>Prato 1</b><span>🍪🍪🍪🍪🍪🍪</span></div><div class="share-group"><b>Prato 2</b><span>🍪🍪🍪🍪🍪🍪</span></div><div class="share-group"><b>Prato 3</b><span>🍪🍪🍪🍪🍪🍪</span></div>',opts:['5','6','9'],ans:1,comment:'Dividimos 18 por 3. Como 3 grupos de 6 formam 18, cada prato terá 6 biscoitos.'}
+ ]},
+ {title:'Trilha dos Saquinhos',short:'Descobrir quantos grupos cabem',icon:'🎒',color:'#fff5df',category:'Divisão — formar grupos',lessonTitle:'E se a pergunta for: quantos grupos conseguimos formar?',lesson:'Agora, cada grupo já tem um tamanho definido. Descobrimos quantos grupos cabem no total. Exemplo: 12 balas em saquinhos com 3 balas cada formam 4 saquinhos.',visual:'<div class="share-group"><b>Saquinho 1</b><span>🍬🍬🍬</span></div><div class="share-group"><b>Saquinho 2</b><span>🍬🍬🍬</span></div><div class="share-group"><b>Saquinho 3</b><span>🍬🍬🍬</span></div><div class="share-group"><b>Saquinho 4</b><span>🍬🍬🍬</span></div>',questions:[
+  {id:'g1',skill:'Divisão — formar grupos',text:'Há 24 balões. Vamos fazer grupos com 4 balões em cada. Quantos grupos serão formados?',visual:'<span style="font-size:26px">🎈🎈🎈🎈</span><span style="font-size:26px">🎈🎈🎈🎈</span><span style="font-size:26px">🎈🎈🎈🎈</span><span style="font-size:26px">🎈🎈🎈🎈</span><span style="font-size:26px">🎈🎈🎈🎈</span><span style="font-size:26px">🎈🎈🎈🎈</span>',opts:['4 grupos','6 grupos','8 grupos'],ans:1,comment:'Cada grupo terá 4 balões. Contamos 4, 8, 12, 16, 20 e 24: formamos 6 grupos. Portanto, 24 ÷ 4 = 6.'},
+  {id:'g2',skill:'Divisão — formar grupos',text:'21 crianças vão formar equipes com 3 crianças em cada. Quantas equipes completas serão formadas?',visual:'<span style="font-size:27px">🧒🧒🧒</span><span style="font-size:27px">🧒🧒🧒</span><span style="font-size:27px">🧒🧒🧒</span><span style="font-size:27px">🧒🧒🧒</span><span style="font-size:27px">🧒🧒🧒</span><span style="font-size:27px">🧒🧒🧒</span><span style="font-size:27px">🧒🧒🧒</span>',opts:['6 equipes','7 equipes','8 equipes'],ans:1,comment:'Formamos equipes de 3 crianças. Como 3 × 7 = 21, serão 7 equipes completas.'},
+  {id:'g3',skill:'Divisão — formar grupos',text:'Uma confeiteira tem 32 biscoitos e coloca 8 em cada caixa. Quantas caixas ela consegue completar?',visual:'<div class="share-group"><b>Uma caixa</b><span>🍪🍪🍪🍪🍪🍪🍪🍪</span></div><div style="font-size:13px;font-weight:900">32 biscoitos no total</div>',opts:['3 caixas','4 caixas','8 caixas'],ans:1,comment:'Cada caixa recebe 8 biscoitos. Como 8 + 8 + 8 + 8 = 32, ela completa 4 caixas. Logo, 32 ÷ 8 = 4.'}
+ ]},
+ {title:'Castelo do Desafio Final',short:'Misturar as quatro operações',icon:'🏰',color:'#f0edff',category:'Revisão geral',lessonTitle:'Chegou a hora de reunir todos os poderes!',lesson:'Leia com atenção o que o problema pede. “Ao todo” pode indicar adição; “sobraram”, subtração; grupos iguais, multiplicação; repartir ou formar grupos, divisão.',visual:'<span style="font-size:32px">＋　−　×　÷</span><span style="font-size:16px;font-weight:900;color:#6a59c7">Você consegue!</span>',questions:[
+  {id:'f1',skill:'Adição',text:'Uma turma arrecadou 36 livros na segunda-feira e 27 na terça-feira. Quantos livros arrecadou nos dois dias?',visual:'<div class="share-group"><b>Segunda</b><span>📚 36</span></div><b>+</b><div class="share-group"><b>Terça</b><span>📚 27</span></div>',opts:['53','63','73'],ans:1,comment:'A pergunta quer o total dos dois dias. Somamos 36 + 27 = 63 livros.'},
+  {id:'f2',skill:'Subtração',text:'Uma loja tinha 81 bolas e vendeu 36. Quantas bolas ainda restam?',visual:'<span style="font-size:30px">⚽ 81</span><b>−</b><span style="font-size:30px">36</span>',opts:['45','55','53'],ans:0,comment:'Precisamos descobrir o que restou: 81 − 36 = 45 bolas.'},
+  {id:'f3',skill:'Multiplicação',text:'Cada uma das 5 mesas tem 6 cadeiras. Quantas cadeiras há ao todo?',visual:'<span style="font-size:25px">🪑🪑🪑🪑🪑</span><span style="font-size:13px">6 cadeiras em cada mesa • 5 mesas</span>',opts:['11','25','30'],ans:2,comment:'São 5 grupos de 6 cadeiras. Fazemos 5 × 6 = 30 cadeiras.'},
+  {id:'f4',skill:'Divisão — repartir',text:'30 morangos serão repartidos igualmente em 5 tigelas. Quantos morangos ficarão em cada tigela?',visual:'<div class="share-group"><b>5 tigelas</b><span>🍓🍓🍓🍓🍓🍓</span></div><div style="font-weight:900">30 morangos ao todo</div>',opts:['5','6','7'],ans:1,comment:'Repartimos 30 morangos em 5 grupos iguais. Como 5 × 6 = 30, cada tigela recebe 6 morangos.'}
+ ]}
+];
+
+// Desafios extras: cada fase agora tem uma pequena maratona de questões.
+levels[0].questions.push(
+ {id:'a4',skill:'Adição',text:'O pirata Pipo encontrou 28 moedas e depois achou mais 14. Quantas moedas ele tem agora?',visual:'<span style="font-size:32px">🏴‍☠️💰 28</span><b>＋</b><span style="font-size:32px">💰 14</span><span style="font-size:14px">Pipo está ficando rico!</span>',opts:['32','42','52'],ans:1,comment:'Juntamos as moedas: 28 + 14 = 42. Pipo tem 42 moedas. (Mas nada de gastar tudo em sorvete!)'},
+ {id:'a5',skill:'Adição',text:'Na festa havia 35 balões azuis e 26 amarelos. Quantos balões havia ao todo?',visual:'<span style="font-size:30px">🎈🎈🎈 <small>35 azuis</small></span><b>＋</b><span style="font-size:30px">🎈🎈🎈 <small>26 amarelos</small></span>',opts:['51','61','71'],ans:1,comment:'Somamos 35 + 26. São 30 + 20 = 50 e 5 + 6 = 11. 50 + 11 = 61 balões.'}
+);
+levels[1].questions.push(
+ {id:'s4',skill:'Subtração',text:'O monstro Guloso tinha 52 biscoitos e comeu 19. Quantos biscoitos sobraram?',visual:'<span style="font-size:34px">👾🍪🍪🍪</span><div style="font-weight:900">52 biscoitos − 19 comidos</div>',opts:['33','43','31'],ans:0,comment:'Fazemos 52 − 19. Tirar 20 daria 32, mas tiramos 1 a menos: 33 biscoitos sobraram. O monstro precisa maneirar!'},
+ {id:'s5',skill:'Subtração',text:'Uma biblioteca tinha 90 livros de histórias. Emprestou 34. Quantos ficaram?',visual:'<span style="font-size:32px">📚 90</span><b>−</b><span style="font-size:32px">📖 34</span>',opts:['56','66','54'],ans:0,comment:'90 − 30 = 60. Depois, 60 − 4 = 56. Ficaram 56 livros na biblioteca.'}
+);
+levels[2].questions.push(
+ {id:'m4',skill:'Multiplicação',text:'O polvo Tito tem 8 tentáculos. Se cada tentáculo segura 2 estrelinhas, quantas estrelinhas ele segura?',visual:'<span style="font-size:42px">🐙</span><span style="font-size:17px">8 tentáculos × 2 estrelas</span>',opts:['10','16','18'],ans:1,comment:'São 8 grupos com 2 estrelas: 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 = 16. O polvo virou decoração!'},
+ {id:'m5',skill:'Multiplicação',text:'Há 7 bicicletas. Cada bicicleta tem 2 rodas. Quantas rodas há ao todo?',visual:'<span style="font-size:35px">🚲 🚲 🚲 🚲 🚲 🚲 🚲</span>',opts:['9','12','14'],ans:2,comment:'Cada bicicleta tem 2 rodas. Então, 7 × 2 = 14 rodas.'}
+);
+levels[3].questions.push(
+ {id:'d4',skill:'Divisão — repartir',text:'24 brigadeiros serão divididos igualmente entre 4 amigos. Quantos cada um recebe?',visual:'<span style="font-size:36px">🍫🍫🍫🍫🍫🍫</span><span style="font-size:14px">24 brigadeiros • 4 amigos</span>',opts:['4','6','8'],ans:1,comment:'Repartimos 24 em 4 partes iguais. Como 4 × 6 = 24, cada amigo recebe 6 brigadeiros.'},
+ {id:'d5',skill:'Divisão — repartir',text:'15 figurinhas serão repartidas igualmente entre 5 crianças. Quantas figurinhas cada uma recebe?',visual:'<span style="font-size:35px">🧒 🧒 🧒 🧒 🧒</span><span style="font-size:14px">15 figurinhas para 5 crianças</span>',opts:['2','3','5'],ans:1,comment:'Distribuímos 15 figurinhas em 5 grupos iguais. Cada criança recebe 3, pois 5 × 3 = 15.'}
+);
+levels[4].questions.push(
+ {id:'g4',skill:'Divisão — formar grupos',text:'A tartaruga Tina tem 30 folhas. Vai colocar 5 folhas em cada montinho. Quantos montinhos fará?',visual:'<span style="font-size:38px">🐢🍃🍃🍃</span><span style="font-size:14px">30 folhas • 5 em cada montinho</span>',opts:['5','6','7'],ans:1,comment:'Queremos saber quantos grupos de 5 cabem em 30. Como 5 × 6 = 30, Tina fará 6 montinhos.'},
+ {id:'g5',skill:'Divisão — formar grupos',text:'Há 28 carrinhos. Em cada caixa cabem 4 carrinhos. Quantas caixas serão necessárias?',visual:'<span style="font-size:35px">🚗🚙🚕🚓</span><span style="font-size:14px">4 carrinhos em cada caixa</span>',opts:['6','7','8'],ans:1,comment:'Formamos grupos de 4 até organizar os 28 carrinhos. 4 × 7 = 28, então serão 7 caixas.'}
+);
+levels[5].questions.push(
+ {id:'f5',skill:'Multiplicação',text:'Uma aranha desenhada tem 8 pernas. Quantas pernas têm 3 aranhas?',visual:'<span style="font-size:36px">🕷️ 🕷️ 🕷️</span>',opts:['11','16','24'],ans:2,comment:'São 3 grupos de 8 pernas: 8 + 8 + 8 = 24. Três aranhas têm 24 pernas.'},
+ {id:'f6',skill:'Divisão — formar grupos',text:'Uma professora tem 36 lápis e coloca 6 em cada pote. Quantos potes consegue encher?',visual:'<span style="font-size:35px">✏️✏️✏️✏️✏️✏️</span><span style="font-size:14px">36 lápis • 6 em cada pote</span>',opts:['5','6','7'],ans:1,comment:'Precisamos descobrir quantos grupos de 6 cabem em 36. Como 6 × 6 = 36, ela enche 6 potes.'}
+);
+
+let unlocked=0,completed=new Set(),levelStars={},activeLevel=0,qIndex=0,attemptCorrect=0,attemptResponses=[],allResponses={},student='';
+const $=id=>document.getElementById(id);
+function renderMap(){
+ const grid=$('levelGrid');grid.innerHTML='';
+ levels.forEach((lv,i)=>{
+  const isLocked=i>unlocked,done=completed.has(i),btn=document.createElement('button');btn.className='level-card';btn.disabled=isLocked;btn.style.textAlign='left';
+  const stars=levelStars[i]||0;const mascot=['🐵','🦜','🐙','🍬','🐢','🐉'][i];btn.innerHTML=`<div class="level-top"><div class="level-icon" style="background:${lv.color}">${lv.icon}</div><span class="level-state">${done?'CONCLUÍDA':isLocked?'🔒 BLOQUEADA':'🟢 BORA JOGAR!'}</span></div><h3>${i+1}. ${lv.title}${i===3||i===4?'<span class="tag-focus">DIVISÃO</span>':''}</h3><p>${mascot} ${lv.short}</p><div class="level-stars">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div><small style="color:#929bb0;font-weight:800">${done?stars+'/3 estrelas':'5+ desafios • conquiste estrelas!'}</small>`;
+  btn.addEventListener('click',()=>startLevel(i));grid.appendChild(btn);
+ });
+ $('progressText').textContent=`${completed.size} de ${levels.length} fases`;$('progressFill').style.width=(completed.size/levels.length*100)+'%';
+}
+function begin(){student=$('studentName').value.trim()||'Aventureiro(a)';$('intro').classList.add('hidden');$('mapSection').scrollIntoView({behavior:'smooth',block:'start'});}
+$('beginBtn').addEventListener('click',begin);
+$('studentName').addEventListener('keydown',e=>{if(e.key==='Enter')begin()});
+function startLevel(i){
+ activeLevel=i;qIndex=0;attemptCorrect=0;attemptResponses=[];
+ $('mapSection').classList.add('hidden');$('learningSection').classList.add('hidden');$('resultsSection').classList.remove('show');$('gameView').classList.add('active');$('questionCard').classList.remove('hidden');$('levelOutcome').classList.remove('show');
+ $('gameLevel').textContent=`Fase ${i+1} • ${levels[i].title}`;$('lessonTitle').textContent=levels[i].lessonTitle;$('lessonText').textContent=levels[i].lesson;
+ renderQuestion();$('gameView').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function renderQuestion(){
+ const lv=levels[activeLevel],q=lv.questions[qIndex];
+ $('questionCounter').textContent=`DESAFIO ${qIndex+1} DE ${lv.questions.length}`;$('visualStage').innerHTML=q.visual||lv.visual;$('questionText').textContent=q.text;$('feedback').className='feedback';$('feedback').innerHTML='';$('nextQuestion').classList.add('hidden');$('gameScore').textContent=`⭐ ${attemptCorrect} acerto${attemptCorrect===1?'':'s'}`;
+ $('questionDots').innerHTML=lv.questions.map((_,i)=>`<span class="dot ${i<qIndex?'done':i===qIndex?'current':''}"></span>`).join('');
+ const opts=$('options');opts.innerHTML='';q.opts.forEach((v,i)=>{const b=document.createElement('button');b.className='option';b.textContent=v;b.addEventListener('click',()=>answer(i));opts.appendChild(b)});
+}
+function answer(choice){
+ const lv=levels[activeLevel],q=lv.questions[qIndex],correct=choice===q.ans;if(correct)attemptCorrect++;
+ allResponses[q.id]={choice,correct};attemptResponses.push({q,choice,correct});
+ [...$('options').children].forEach((b,i)=>{b.disabled=true;if(i===q.ans)b.classList.add('correct');else if(i===choice&&!correct)b.classList.add('wrong')});
+ const fb=$('feedback');fb.className='feedback show '+(correct?'good':'try');fb.innerHTML=`<b>${correct?'Muito bem! Você acertou! ⭐':'Quase! Vamos aprender com essa questão.'}</b>${q.comment}`;
+ $('gameScore').textContent=`⭐ ${attemptCorrect} acerto${attemptCorrect===1?'':'s'}`;$('nextQuestion').textContent=qIndex===lv.questions.length-1?'Ver resultado da fase →':'Próximo desafio →';$('nextQuestion').classList.remove('hidden');
+}
+$('nextQuestion').addEventListener('click',()=>{if(qIndex<levels[activeLevel].questions.length-1){qIndex++;renderQuestion()}else finishLevel()});
+function finishLevel(){
+ const lv=levels[activeLevel],need=Math.ceil(lv.questions.length*0.6),passed=attemptCorrect>=need,stars=attemptCorrect===lv.questions.length?3:attemptCorrect/lv.questions.length>=0.8?2:1;$('questionCard').classList.add('hidden');const out=$('levelOutcome');out.classList.add('show');
+ if(passed){completed.add(activeLevel);levelStars[activeLevel]=Math.max(levelStars[activeLevel]||0,stars);unlocked=Math.max(unlocked,Math.min(activeLevel+1,levels.length-1));}
+ out.innerHTML=passed?`<div class="outcome-icon">${activeLevel===levels.length-1?'🏆':'🌟'}</div><h2>${activeLevel===levels.length-1?'Você conquistou a ilha!':'Fase desbloqueada!'}</h2><p>Você acertou <b>${attemptCorrect} de ${lv.questions.length}</b> desafios. ${stars===3?'PERFEITO: fase sem nenhum erro!':stars===2?'Mandou bem! Mais uma estrelinha para sua coleção.':'Você passou raspando, mas passou! Vamos treinar para ganhar mais estrelas.'} ${activeLevel===levels.length-1?'Sua aventura terminou. Agora confira seu diagnóstico personalizado.':'Muito bem! A próxima etapa está pronta para você.'}</p><div style="font-size:28px;color:#efb348;margin:10px 0 18px">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</div><button class="primary" id="outcomeNext">${activeLevel===levels.length-1?'Ver meu diagnóstico':'Continuar aventura →'}</button>`:
+ `<div class="outcome-icon">💪</div><h2>Vamos tentar mais uma vez?</h2><p>Você acertou <b>${attemptCorrect} de ${lv.questions.length}</b>. Para abrir a próxima fase, tente alcançar pelo menos ${need} acertos. Reveja a dica e tente novamente!</p><button class="primary" id="outcomeNext">Repetir esta fase ↻</button>`;
+ $('outcomeNext').addEventListener('click',()=>{if(!passed){startLevel(activeLevel)}else if(activeLevel===levels.length-1){showResults()}else{renderMap();$('gameView').classList.remove('active');$('mapSection').classList.remove('hidden');$('learningSection').classList.remove('hidden');$('mapSection').scrollIntoView({behavior:'smooth'})}});
+ renderMap();
+}
+$('backMap').addEventListener('click',()=>{$('gameView').classList.remove('active');$('mapSection').classList.remove('hidden');$('learningSection').classList.remove('hidden');renderMap();$('mapSection').scrollIntoView({behavior:'smooth'})});
+function showResults(){
+ $('gameView').classList.remove('active');$('resultsSection').classList.add('show');$('resultTitle').textContent=`Muito bem, ${student}!`;$('resultSubtitle').textContent='Você completou as seis fases da Ilha das Operações. Veja o que já domina e o que pode praticar.';
+ const all=levels.flatMap(l=>l.questions).filter(q=>allResponses[q.id]);const correct=all.filter(q=>allResponses[q.id].correct).length;const total=all.length;const pct=total?Math.round(correct/total*100):0;const wrong=total-correct;
+ $('scoreBig').textContent=pct+'%';$('pieCenter').innerHTML=`${pct}%<small>acertos</small>`;$('resultPie').style.background=`conic-gradient(var(--teal) 0 ${pct}%, #f2a2a7 ${pct}% 100%)`;$('correctLegend').textContent=`${correct} acerto${correct===1?'':'s'}`;$('wrongLegend').textContent=`${wrong} para praticar`;$('resultCount').textContent=`${correct} respostas corretas em ${total} desafios respondidos.`;
+ const skills=['Adição','Subtração','Multiplicação','Divisão — repartir','Divisão — formar grupos'];let skillData=[];
+ skills.forEach(s=>{const qs=all.filter(q=>q.skill===s);const c=qs.filter(q=>allResponses[q.id].correct).length;const p=qs.length?Math.round(c/qs.length*100):0;skillData.push({name:s,c,total:qs.length,p});});
+ $('skillList').innerHTML=skillData.map(s=>`<div class="skill-row"><span>${s.name}</span><div class="skill-bar"><div class="skill-fill" style="width:${s.p}%"></div></div><b>${s.p}%</b></div>`).join('');
+ const ranked=[...skillData].sort((a,b)=>a.p-b.p);const hard=ranked.filter(s=>s.total&&s.p<60);const easy=ranked.filter(s=>s.total&&s.p>=80);let guidance='';
+ if(easy.length)guidance+=`<p><b>Você demonstrou facilidade em:</b> ${easy.map(s=>s.name.toLowerCase()).join(', ')}. Continue resolvendo problemas para manter essa aprendizagem.</p>`;
+ if(hard.length){guidance+='<p><b>Conteúdos que merecem mais atenção:</b></p><ul>'+hard.map(s=>`<li><b>${s.name} (${s.p}% de acertos):</b> ${studyTip(s.name)}</li>`).join('')+'</ul>'}
+ const mid=ranked.filter(s=>s.total&&s.p>=60&&s.p<80);if(mid.length)guidance+=`<p><b>Em desenvolvimento:</b> ${mid.map(s=>s.name.toLowerCase()).join(', ')}. Faça mais alguns exercícios desses assuntos e explique em voz alta como pensou.</p>`;
+ if(!hard.length&&!mid.length)guidance+='<p>Excelente resultado! Você acertou pelo menos 80% em todos os conteúdos. Para avançar, crie seus próprios problemas usando situações da escola e de casa.</p>';
+ guidance+='<p><b>Uma rotina curta de estudo:</b> pratique por 10 a 15 minutos, usando tampinhas, lápis ou desenhos para representar as quantidades. Na divisão, confira sempre sua resposta com uma multiplicação.</p>';
+ $('guidanceText').innerHTML=guidance;
+ $('answerKey').innerHTML=levels.flatMap(l=>l.questions.map(q=>({q,level:l.title}))).map((item,i)=>{const r=allResponses[item.q.id];const userAnswer=r?item.q.opts[r.choice]:'Não respondida';return `<details class="key-item"><summary>${i+1}. ${item.q.text}<span class="key-status ${r&&r.correct?'ok':'no'}">${r?(r.correct?'ACERTOU':'REVER'): 'NÃO RESPONDIDA'}</span></summary><p><b>Fase:</b> ${item.level}<br><b>Sua resposta:</b> ${userAnswer}<br><b>Resposta correta:</b> ${item.q.opts[item.q.ans]}<br><b>Comentário:</b> ${item.q.comment}</p></details>`}).join('');
+ $('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function studyTip(skill){
+ const tips={
+ 'Adição':'treine juntar duas quantidades com objetos e depois registre a conta. Separe dezenas e unidades para facilitar a soma.',
+ 'Subtração':'represente a quantidade inicial com objetos e retire o que foi usado. Depois, pratique a contagem para trás e a decomposição das dezenas.',
+ 'Multiplicação':'desenhe fileiras e colunas ou monte grupos com a mesma quantidade. Transforme a multiplicação em uma adição de parcelas iguais.',
+ 'Divisão — repartir':'distribua tampinhas uma a uma entre pratos ou pessoas. Confira se todos receberam a mesma quantidade.',
+ 'Divisão — formar grupos':'monte grupos com a quantidade indicada e conte quantos grupos conseguiu formar. Use a pergunta “quantos grupos cabem?”.'
+ };return tips[skill]||'revise o exemplo e resolva novos problemas.';
+}
+$('playAgain').addEventListener('click',resetGame);$('backToLessons').addEventListener('click',()=>{$('resultsSection').classList.remove('show');$('intro').classList.remove('hidden');$('mapSection').classList.remove('hidden');$('learningSection').classList.remove('hidden');$('mapSection').scrollIntoView({behavior:'smooth'})});
+function resetGame(){unlocked=0;completed=new Set();levelStars={};activeLevel=0;qIndex=0;attemptCorrect=0;attemptResponses=[];allResponses={};$('resultsSection').classList.remove('show');$('gameView').classList.remove('active');$('intro').classList.remove('hidden');$('mapSection').classList.remove('hidden');$('learningSection').classList.remove('hidden');$('studentName').value='';student='';renderMap();window.scrollTo({top:0,behavior:'smooth'})}
+renderMap();
+</script>
+</body>
+</html>
